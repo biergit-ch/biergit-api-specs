@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: biergit.ch api
+  version: 1.0.0
+  description: API for the biergit.ch backend
+  contact:
+    name: biergit
+    email: api@biergit.ch
+servers:
+  - url: 'https://biergit.ch/api/v1/'
+tags:
+  - name: groups
+    description: groups
+  - name: users
+    description: users
+paths:
+  /groups:
+    get:
+      tags:
+        - groups
+      summary: groups
+      description: |
+        Get all groups
+      responses:
+        '200':
+          description: Successful 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/grouplist'
+  /groups/{groupId}:
+    get:
+      tags:
+        - groups
+      summary: groups
+      description: |
+        Get all groups
+      parameters:
+        - in: path
+          name: groupId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the user to get        
+      responses:
+        '200':
+          description: Successful 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/grouplist'          
+  /users:
+    get:
+      tags:
+        - users
+      summary: users
+      description: |
+        Get all users
+      responses:
+        '200':
+          description: Successful 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userlist'
+  /users/{userId}:
+    get:
+      tags:
+        - users
+      summary: users
+      description: |
+        Get all users
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the user to get        
+      responses:
+        '200':
+          description: Successful 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'               
+components:
+  schemas:
+    grouplist:
+      type: array
+      items:
+        allOf:
+          - $ref: '#/components/schemas/group'
+    group:
+      type: object
+      properties:
+        id:
+          type: string
+          example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
+        name:
+          type: string
+          example: "Bier Gruppe"
+    userlist:
+      type: array
+      items:
+        allOf:
+          - $ref: '#/components/schemas/user'
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+          example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
+        name:
+          type: string
+          example: "Frau Biergit"
