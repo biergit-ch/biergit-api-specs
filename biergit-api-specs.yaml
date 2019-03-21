@@ -11,14 +11,14 @@ servers:
 tags:
   - name: groups
     description: groups
-  - name: users
-    description: users
+  - name: profiles
+    description: profiles
 paths:
   /groups:
     get:
       tags:
         - groups
-      summary: groups
+      summary: Get all groups
       description: |
         Get all groups
       responses:
@@ -32,9 +32,9 @@ paths:
     get:
       tags:
         - groups
-      summary: groups
+      summary: Get a group
       description: |
-        Get all groups
+        Get a group
       parameters:
         - in: path
           name: groupId
@@ -48,31 +48,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/grouplist'          
-  /users:
+                $ref: '#/components/schemas/grouplist'  
+  /groups/{groupId}/members:
     get:
       tags:
-        - users
-      summary: users
+        - groups
+      summary: Get all members of a groups
       description: |
-        Get all users
-      responses:
-        '200':
-          description: Successful 
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/userlist'
-  /users/{userId}:
-    get:
-      tags:
-        - users
-      summary: users
-      description: |
-        Get all users
+        Get all members of a groups
       parameters:
         - in: path
-          name: userId
+          name: groupId
           schema:
             type: integer
           required: true
@@ -83,7 +69,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user'               
+                $ref: '#/components/schemas/userlist'    
+  /profiles/me:
+    get:
+      tags:
+        - profiles
+      summary: Get my profile data
+      description: |
+        Get all users
+      responses:
+        '200':
+          description: Successful 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
 components:
   schemas:
     grouplist:
