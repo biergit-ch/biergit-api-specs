@@ -27,28 +27,54 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/grouplist'
+                $ref: '#/components/schemas/Groups'
   /groups/{groupId}:
     get:
       tags:
         - groups
-      summary: groups
+      summary: group
       description: |
-        Get all groups
+        Gets group by id
       parameters:
         - in: path
           name: groupId
           schema:
             type: integer
           required: true
-          description: Numeric ID of the user to get        
+          description: Numeric ID of the group to get        
       responses:
         '200':
           description: Successful 
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/grouplist'          
+                $ref: '#/components/schemas/Groups'     
+  /groups/{groupId}/members:
+    post:
+      tags:
+        - groups
+      summary: groups
+      description: |
+        Invite users to group, invitation emails are being sent out 
+      parameters:
+        - in: path
+          name: groupId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the group to get  
+        - in: body
+          name: email
+          schema:
+            type: array
+            items:
+              type: string
+              format: email
+          required: true
+          description: One or more email(s) of the user(s) to invite        
+      responses:
+        '202':
+          description: Successful       
   /users:
     get:
       tags:
@@ -62,7 +88,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/userlist'
+                $ref: '#/components/schemas/Users'
   /users/{userId}:
     get:
       tags:
@@ -83,15 +109,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user'               
+                $ref: '#/components/schemas/User' 
+
+  /expenses:
+    post:
+      tags:
+        - expenses
+      summary: expenses
+      name: expense
+      description: |
+        Create new expense
+      parameters:
+        - in : body
+          name: expense
+          schema:
+            $ref: '#/components/schemas/Expense'
+      responses:
+        '201':
+          description: Successful       
 components:
   schemas:
-    grouplist:
+    Groups:
       type: array
       items:
         allOf:
-          - $ref: '#/components/schemas/group'
-    group:
+          - $ref: '#/components/schemas/Group'
+    Group:
       type: object
       properties:
         id:
@@ -100,12 +143,12 @@ components:
         name:
           type: string
           example: "Bier Gruppe"
-    userlist:
+    Users:
       type: array
       items:
         allOf:
-          - $ref: '#/components/schemas/user'
-    user:
+          - $ref: '#/components/schemas/User'
+    User:
       type: object
       properties:
         id:
@@ -114,3 +157,33 @@ components:
         name:
           type: string
           example: "Frau Biergit"
+        email:
+          type: email
+          example: "frau.biergit@biergit.ch"
+    Expenses:
+      type: array
+      items:
+        allOf: 
+          - $ref: '#/components/schemas/Expense'
+    Expense:
+      type: object
+      properties:
+        context:
+          type: string
+          nullable: true
+          example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
+          description: Can be used as user or group id
+        from:
+          type: string
+          example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
+          description: Unique userid
+        to: 
+          type: array
+          items:
+            type: string
+            example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
+            description: userid
+          description: a list of userids
+        quantity:
+          type: integer
+          example: 3
