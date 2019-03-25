@@ -32,15 +32,9 @@ paths:
     get:
       tags:
         - groups
-<<<<<<< HEAD
       summary: group
       description: |
         Gets group by id
-=======
-      summary: Get a group
-      description: |
-        Get a group
->>>>>>> ba96a08d33257469873a76a30b5b601066ef9e38
       parameters:
         - in: path
           name: groupId
@@ -54,7 +48,6 @@ paths:
           content:
             application/json:
               schema:
-<<<<<<< HEAD
                 $ref: '#/components/schemas/Groups'     
   /groups/{groupId}/members:
     post:
@@ -83,10 +76,6 @@ paths:
         '202':
           description: Successful       
   /users:
-=======
-                $ref: '#/components/schemas/grouplist'  
-  /groups/{groupId}/members:
->>>>>>> ba96a08d33257469873a76a30b5b601066ef9e38
     get:
       tags:
         - groups
@@ -106,13 +95,8 @@ paths:
           content:
             application/json:
               schema:
-<<<<<<< HEAD
                 $ref: '#/components/schemas/Users'
   /users/{userId}:
-=======
-                $ref: '#/components/schemas/userlist'    
-  /profiles/me:
->>>>>>> ba96a08d33257469873a76a30b5b601066ef9e38
     get:
       tags:
         - profiles
@@ -125,7 +109,6 @@ paths:
           content:
             application/json:
               schema:
-<<<<<<< HEAD
                 $ref: '#/components/schemas/User' 
 
   /expenses:
@@ -144,9 +127,6 @@ paths:
       responses:
         '201':
           description: Successful       
-=======
-                $ref: '#/components/schemas/user'
->>>>>>> ba96a08d33257469873a76a30b5b601066ef9e38
 components:
   schemas:
     Groups:
