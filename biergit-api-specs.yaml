@@ -13,6 +13,10 @@ tags:
     description: groups
   - name: profiles
     description: profiles
+security:
+  - OAuth2:
+      - read
+      - write    
 paths:
   /groups:
     get:
@@ -20,7 +24,9 @@ paths:
         - groups
       summary: Get all groups
       description: |
-        Get all groups
+        get all groups.
+      security:
+        - OAuth2: [admin]
       responses:
         '200':
           description: Successful 
@@ -28,11 +34,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Groups'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
   /groups/{groupId}:
     get:
       tags:
         - groups
-      summary: group
+      summary: update group
+      security:
+        - OAuth2: [read]
       description: |
         Gets group by id
       parameters:
@@ -48,7 +60,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Groups'     
+                $ref: '#/components/schemas/Groups'
+    delete:
+      tags:
+        - groups
+      summary: delete group
+      security:
+        - OAuth2: [delete_group]
+      parameters:
+        - in: path
+          name: groupId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the group to get
+      responses:
+        '200':
+          description: Successful 
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
   /groups/{groupId}/members:
     post:
       tags:
@@ -56,6 +88,8 @@ paths:
       summary: groups
       description: |
         Invite users to group, invitation emails are being sent out 
+      security:
+        - OAuth2: [write]
       parameters:
         - in: path
           name: groupId
@@ -81,6 +115,8 @@ paths:
       summary: Get all members of a groups
       description: |
         Get all members of a groups
+      security:
+        - OAuth2: [write]
       parameters:
         - in: path
           name: groupId
@@ -101,7 +137,9 @@ paths:
         - groups
       summary: Link to join a group
       description: |
-        Get all members of a groups
+        Join a group.
+      security:
+        - OAuth2: [read]
       parameters:
         - in: path
           name: groupId
@@ -124,7 +162,9 @@ paths:
         - profiles
       summary: Get my profile data
       description: |
-        Get all users
+        Get my profile
+      security:
+        - OAuth2: [read]
       responses:
         '200':
           description: Successful 
@@ -141,6 +181,8 @@ paths:
       name: expense
       description: |
         Create new expense
+      security:
+        - OAuth2: [read]
       parameters:
         - in : body
           name: expense
@@ -150,6 +192,32 @@ paths:
         '201':
           description: Successful       
 components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      bearerFormat: JWT
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OpenID:
+      type: openIdConnect
+      openIdConnectUrl: https://biergit.eu.auth0.com/.well-known/openid-configuration
+    OAuth2:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://biergit.eu.auth0.com/authorize
+          tokenUrl: https://biergit.eu.auth0.com/oauth/token
+          scopes:
+            delete_group: Grants read access
+            admin: Grants access to admin operations
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    ForbiddenError:
+      description: You don't have the permission to perform this action
   schemas:
     Groups:
       type: array
