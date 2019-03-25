@@ -75,7 +75,6 @@ paths:
       responses:
         '202':
           description: Successful       
-  /users:
     get:
       tags:
         - groups
