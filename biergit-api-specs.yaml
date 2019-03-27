@@ -13,8 +13,9 @@ tags:
     description: groups
   - name: profiles
     description: profiles
-security:
-  - OAuth2: []
+security: 
+  - OAuth2:
+    - read
 paths:
   /groups:
     get:
@@ -42,7 +43,7 @@ paths:
         - groups
       summary: update group
       security:
-        - OAuth2: [read]
+        - OAuth2: []
       description: |
         Gets group by id
       parameters:
@@ -64,7 +65,7 @@ paths:
         - groups
       summary: delete group
       security:
-        - OAuth2: [delete_group]
+        - OAuth2: [write]
       parameters:
         - in: path
           name: groupId
@@ -95,15 +96,14 @@ paths:
             type: integer
           required: true
           description: Numeric ID of the group to get  
-        - in: body
-          name: email
-          schema:
-            type: array
-            items:
-              type: string
-              format: email
-          required: true
-          description: One or more email(s) of the user(s) to invite        
+      requestBody:
+        name: emails
+        required: true
+        description: One or more email(s) of the user(s) to invite        
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/EmailModel'
       responses:
         '202':
           description: Successful       
@@ -136,8 +136,7 @@ paths:
       summary: Link to join a group
       description: |
         Join a group.
-      security:
-        - OAuth2: [read]
+      security: []
       parameters:
         - in: path
           name: groupId
@@ -170,7 +169,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User' 
-
   /expenses:
     post:
       tags:
@@ -181,35 +179,41 @@ paths:
         Create new expense
       security:
         - OAuth2: [read]
-      parameters:
-        - in : body
-          name: expense
-          schema:
-            $ref: '#/components/schemas/Expense'
+      requestBody:
+        name: expense
+        required: true
+        schema:
+          $ref: '#/components/schemas/Expense'
       responses:
         '201':
           description: Successful       
 components:
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-    OpenID:
-      type: openIdConnect
-      openIdConnectUrl: https://biergit.eu.auth0.com/.well-known/openid-configuration
+    # OpenID:
+    #   type: openIdConnect
+    #   openIdConnectUrl: https://biergit.eu.auth0.com/.well-known/openid-configuration
     OAuth2:
       type: oauth2
       description: This API uses OAuth 2 with the implicit grant flow. [More info](https://tools.ietf.org/html/rfc6749#section-1.3.2)
       flows:
         implicit:
           authorizationUrl: https://biergit.eu.auth0.com/authorize
-          scopes: {}
+          scopes: 
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
     ForbiddenError:
       description: You don't have the permission to perform this action
+  requests:
+    EmailModel:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
   schemas:
     Groups:
       type: array
@@ -240,7 +244,8 @@ components:
           type: string
           example: "Frau Biergit"
         email:
-          type: email
+          type: string
+          format: email
           example: "frau.biergit@biergit.ch"
     Expenses:
       type: array
