@@ -14,9 +14,7 @@ tags:
   - name: profiles
     description: profiles
 security:
-  - OAuth2:
-      - read
-      - write    
+  - OAuth2: []
 paths:
   /groups:
     get:
@@ -26,7 +24,7 @@ paths:
       description: |
         get all groups.
       security:
-        - OAuth2: [admin]
+        - OAuth2: []
       responses:
         '200':
           description: Successful 
@@ -193,10 +191,6 @@ paths:
           description: Successful       
 components:
   securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-      bearerFormat: JWT
     BearerAuth:
       type: http
       scheme: bearer
@@ -206,13 +200,11 @@ components:
       openIdConnectUrl: https://biergit.eu.auth0.com/.well-known/openid-configuration
     OAuth2:
       type: oauth2
+      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://tools.ietf.org/html/rfc6749#section-1.3.2)
       flows:
         implicit:
           authorizationUrl: https://biergit.eu.auth0.com/authorize
-          tokenUrl: https://biergit.eu.auth0.com/oauth/token
-          scopes:
-            delete_group: Grants read access
-            admin: Grants access to admin operations
+          scopes: {}
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
