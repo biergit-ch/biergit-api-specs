@@ -1,149 +1,166 @@
-openapi: 3.0.0
+openapi: 3.0.1
 info:
   title: biergit.ch api
   version: 1.0.0
   description: API for the biergit.ch backend
   contact:
     name: biergit
+    url: https://biergit.ch
     email: api@biergit.ch
 servers:
-  - url: 'https://biergit.ch/api/v1/'
+  - url: https://biergit.ch/api/v1/
 tags:
   - name: groups
     description: groups
   - name: profiles
     description: profiles
-security: 
+  - name: expenses
+    description: expenses
+security:
   - OAuth2:
-    - read
+      - read
 paths:
   /groups:
     get:
       tags:
         - groups
+      operationId: get-groups
       summary: Get all groups
       description: |
         get all groups.
       security:
-        - OAuth2: []
+        - OAuth2:
+            []
       responses:
-        '200':
-          description: Successful 
+        "200":
+          description: Successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Groups'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-  /groups/{groupId}:
+                $ref: "#/components/schemas/Groups"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+  "/groups/{groupId}":
     get:
+      operationId: get-group
       tags:
         - groups
       summary: update group
       security:
-        - OAuth2: []
+        - OAuth2:
+            []
       description: |
         Gets group by id
       parameters:
         - in: path
           name: groupId
+          required: true
           schema:
             type: integer
-          required: true
-          description: Numeric ID of the group to get        
+          description: Numeric ID of the group to get
       responses:
-        '200':
-          description: Successful 
+        "200":
+          description: Successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Groups'
+                $ref: "#/components/schemas/Groups"
     delete:
       tags:
         - groups
+      operationId: delete-group
       summary: delete group
       security:
-        - OAuth2: [write]
+        - OAuth2:
+            - write
       parameters:
         - in: path
           name: groupId
+          required: true
           schema:
             type: integer
-          required: true
           description: Numeric ID of the group to get
       responses:
-        '200':
-          description: Successful 
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-  /groups/{groupId}/members:
+        "200":
+          description: Successful
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+  "/groups/{groupId}/members":
     post:
       tags:
         - groups
+      operationId: invite-user
       summary: groups
       description: |
         Invite users to group, invitation emails are being sent out 
       security:
-        - OAuth2: [write]
+        - OAuth2:
+            - write
       parameters:
         - in: path
+          required: true
           name: groupId
           schema:
             type: integer
-          required: true
-          description: Numeric ID of the group to get  
+          description: Numeric ID of the group to get
       requestBody:
-        name: emails
         required: true
-        description: One or more email(s) of the user(s) to invite        
         content:
           application/json:
             schema:
-              $ref: '#/components/requests/EmailModel'
+              $ref: "#/components/schemas/EmailModel"
       responses:
-        '202':
-          description: Successful       
+        "202":
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Groups'
     get:
       tags:
         - groups
+      operationId: get-group-memers
       summary: Get all members of a groups
       description: |
         Get all members of a groups
       security:
-        - OAuth2: [write]
+        - OAuth2:
+            - write
       parameters:
         - in: path
           name: groupId
           schema:
             type: integer
           required: true
-          description: Numeric ID of the user to get        
+          description: Numeric ID of the user to get
       responses:
-        '200':
-          description: Successful 
+        "200":
+          description: Successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users'
-  /groups/{groupId}/verify/{verificationToken}:
+                $ref: "#/components/schemas/Members"
+  "/groups/{groupId}/verify/{verificationToken}":
     get:
       tags:
         - groups
+      operationId: join-group
       summary: Link to join a group
       description: |
         Join a group.
-      security: []
+      security:
+        []
       parameters:
         - in: path
           name: groupId
           schema:
             type: integer
           required: true
-          description: Numeric ID of the user to get        
+          description: Numeric ID of the user to get
         - in: path
           name: verificationToken
           schema:
@@ -151,54 +168,56 @@ paths:
           required: true
           description: JWT generated by the backend
       responses:
-        '200':
-          description: Successful 
+        "200":
+          description: Successful
   /profiles/me:
     get:
       tags:
         - profiles
+      operationId: get-profile
       summary: Get my profile data
       description: |
         Get my profile
       security:
-        - OAuth2: [read]
+        - OAuth2:
+            - read
       responses:
-        '200':
-          description: Successful 
+        "200":
+          description: Successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User' 
+                $ref: "#/components/schemas/Profile"
   /expenses:
     post:
       tags:
         - expenses
+      operationId: create-expense
       summary: expenses
-      name: expense
       description: |
         Create new expense
       security:
-        - OAuth2: [read]
+        - OAuth2:
+            - write
       requestBody:
-        name: expense
         required: true
-        schema:
-          $ref: '#/components/schemas/Expense'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Expense'
       responses:
-        '201':
-          description: Successful       
+        "201":
+          description: Successful
 components:
   securitySchemes:
-    # OpenID:
-    #   type: openIdConnect
-    #   openIdConnectUrl: https://biergit.eu.auth0.com/.well-known/openid-configuration
     OAuth2:
       type: oauth2
-      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://tools.ietf.org/html/rfc6749#section-1.3.2)
+      description: This API uses OAuth 2 with the implicit grant flow. [More
+        info](https://tools.ietf.org/html/rfc6749#section-1.3.2)
       flows:
         implicit:
           authorizationUrl: https://biergit.eu.auth0.com/authorize
-          scopes: 
+          scopes:
             read: Grants read access
             write: Grants write access
             admin: Grants access to admin operations
@@ -207,19 +226,16 @@ components:
       description: Access token is missing or invalid
     ForbiddenError:
       description: You don't have the permission to perform this action
-  requests:
+  schemas:
     EmailModel:
       type: object
       properties:
         email:
           type: string
           format: email
-  schemas:
     Groups:
-      type: array
-      items:
-        allOf:
-          - $ref: '#/components/schemas/Group'
+      allOf:
+        - $ref: "#/components/schemas/Group"
     Group:
       type: object
       properties:
@@ -228,13 +244,20 @@ components:
           example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
         name:
           type: string
-          example: "Bier Gruppe"
-    Users:
-      type: array
-      items:
-        allOf:
-          - $ref: '#/components/schemas/User'
-    User:
+          example: Bier Gruppe
+    Members:
+      allOf:
+        - $ref: "#/components/schemas/Member"
+    Member: 
+      type: object
+      properties:
+        firstname: 
+          type: string
+          example: Member
+        lastname: 
+          type: string  
+          example: Dember
+    Profile:
       type: object
       properties:
         id:
@@ -242,35 +265,30 @@ components:
           example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
         name:
           type: string
-          example: "Frau Biergit"
+          example: Frau Biergit
         email:
           type: string
           format: email
-          example: "frau.biergit@biergit.ch"
+          example: frau.biergit@biergit.ch
     Expenses:
-      type: array
-      items:
-        allOf: 
-          - $ref: '#/components/schemas/Expense'
+      allOf:
+        - $ref: "#/components/schemas/Expense"
     Expense:
       type: object
       properties:
         context:
           type: string
-          nullable: true
           example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
           description: Can be used as user or group id
         from:
           type: string
           example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
           description: Unique userid
-        to: 
+        to:
           type: array
+          description: a list of userids
           items:
             type: string
-            example: d70eac2d-0b96-49e6-95cb-3e55574fa5bc
-            description: userid
-          description: a list of userids
         quantity:
           type: integer
           example: 3
